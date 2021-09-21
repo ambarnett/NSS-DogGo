@@ -9,7 +9,8 @@ namespace DogGo.Repositories
     {
         private readonly IConfiguration _config;
 
-        // The constructor accepts an IConfiguration object as a parameter. This class comes from the ASP.NET framework and is useful
+        // The constructor accepts an IConfiguration object as a parameter.
+        // This class comes from the ASP.NET framework and is useful
         // for retrieving things out of the appsettings.json file like connection strings.
         public WalkerRepository(IConfiguration config)
         {
@@ -33,7 +34,7 @@ namespace DogGo.Repositories
                 {
                     cmd.CommandText = @"
                         SELECT Id, [Name], ImageUrl, NeighborhoodId
-                        FROM walker
+                        FROM Walker
                     ";
 
                     SqlDataReader reader = cmd.ExecuteReader();
