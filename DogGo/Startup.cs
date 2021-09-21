@@ -30,6 +30,7 @@ namespace DogGo
             services.AddTransient<IWalkerRepository, WalkerRepository>(); //This is saying "anytime my program asks for "IWalkerRepository" make "WalkerRepository"
             services.AddTransient<IOwnerRepository, OwnerRepository>();
             services.AddTransient<INeighborhoodRepository, NeighborhoodRepository>();
+            services.AddTransient<IDogRepository, DogRepository>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
