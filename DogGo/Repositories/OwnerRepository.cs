@@ -76,7 +76,7 @@ namespace DogGo.Repositories
                 conn.Open();
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = @"SELECT Id, 
+                    cmd.CommandText = @"SELECT o.Id, 
                                             o.Email, 
                                             o.[Name], 
                                             o.Address, 
@@ -84,7 +84,7 @@ namespace DogGo.Repositories
                                             o.Phone 
                                         FROM owner o
                                         LEFT JOIN Neighborhood n ON o.NeighborhoodId = n.Id
-                                        WHERE o.Id = @o.id";
+                                        WHERE o.Id = @id";
                     cmd.Parameters.AddWithValue("@id", id);
 
                     SqlDataReader reader = cmd.ExecuteReader();

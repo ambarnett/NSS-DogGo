@@ -81,7 +81,7 @@ namespace DogGo.Repositories
                                                 ISNULL(d.ImageUrl, 'None') AS ImageUrl
                                                 FROM dog d
                                                 LEFT JOIN Owner o ON d.OwnerId = o.Id
-                                                WHERE d.Id = @d.id";
+                                                WHERE d.Id = @id";
                     cmd.Parameters.AddWithValue("@id", id);
 
                     SqlDataReader reader = cmd.ExecuteReader();
