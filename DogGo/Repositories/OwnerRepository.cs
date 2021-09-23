@@ -76,7 +76,7 @@ namespace DogGo.Repositories
                 conn.Open();
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = @"SELECT Id, 
+                    cmd.CommandText = @"SELECT o.Id, 
                                             o.Email, 
                                             o.[Name], 
                                             o.Address, 
@@ -84,7 +84,7 @@ namespace DogGo.Repositories
                                             o.Phone 
                                         FROM owner o
                                         LEFT JOIN Neighborhood n ON o.NeighborhoodId = n.Id
-                                        WHERE o.Id = @o.id";
+                                        WHERE o.Id = @id";
                     cmd.Parameters.AddWithValue("@id", id);
 
                     SqlDataReader reader = cmd.ExecuteReader();
@@ -113,6 +113,121 @@ namespace DogGo.Repositories
                         reader.Close();
                         return null;
                     }
+                }
+            }
+        }
+
+        public Owner GetOwnerByEmail(string email)
+        {
+            using (SqlConnection conn = Connection)
+            {
+                conn.Open();
+
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"SELECT 
+                                            o.Id, 
+                                            o.[Name], 
+                                            o.Email, 
+                                            o.Address, 
+                                            o.Phone, 
+                                            n.Name AS Neighborhood 
+                                        FROM Owner o 
+                                        LEFT JOIN Neighborhood n ON o.NeighborhoodId = n.Id 
+                                        WHERE o.Email = @email";
+                    cmd.Parameters.AddWithValue("@email", email);
+
+                    SqlDataReader reader = cmd.ExecuteReader();
+
+                    if (reader.Read())
+                    {
+                        Owner owner = new Owner()
+                        {
+                            Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                            Name = reader.GetString(reader.GetOrdinal("Name")),
+                            Email = reader.GetString(reader.GetOrdinal("Email")),
+                            Address = reader.GetString(reader.GetOrdinal("Address")),
+                            Phone = reader.GetString(reader.GetOrdinal("Phone")),
+                            Neighborhood = new Neighborhood
+                            {
+                                Name = reader.GetString(reader.GetOrdinal("Neighborhood"))
+                            }
+                        };
+
+                        reader.Close();
+                        return owner;
+                    }
+
+                    reader.Close();
+                    return null;
+                }
+            }
+        }
+
+        public void AddOwner(Owner owner)
+        {
+            using (SqlConnection conn = Connection)
+            {
+                conn.Open();
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"INSERT INTO Owner ([Name], Email, Phone, Address, NeighborhoodId) 
+                                        OUTPUT INSERTED.ID 
+                                        VALUES (@name, @email, @phoneNumber, @address, @neighborhoodId);";
+                    cmd.Parameters.AddWithValue("@name", owner.Name);
+                    cmd.Parameters.AddWithValue("@email", owner.Email);
+                    cmd.Parameters.AddWithValue("@phoneNumber", owner.Phone);
+                    cmd.Parameters.AddWithValue("@address", owner.Address);
+                    cmd.Parameters.AddWithValue("@neighborhoodId", owner.NeighborhoodId);
+
+                    int id = (int)cmd.ExecuteScalar();
+
+                    owner.Id = id;
+                }
+            }
+        }
+
+        public void UpdateOwner(Owner owner)
+        {
+            using (SqlConnection conn = Connection)
+            {
+                conn.Open();
+
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"UPDATE Owner 
+                                        SET 
+                                            [Name] = @name, 
+                                            Email = @email, 
+                                            Address = @address, 
+                                            Phone = @phone, 
+                                            NeighborhoodId = @neighborhoodId 
+                                        WHERE Id = @id";
+                    cmd.Parameters.AddWithValue("@name", owner.Name);
+                    cmd.Parameters.AddWithValue("@email", owner.Email);
+                    cmd.Parameters.AddWithValue("@address", owner.Address);
+                    cmd.Parameters.AddWithValue("@phone", owner.Phone);
+                    cmd.Parameters.AddWithValue("@neighborhoodId", owner.NeighborhoodId);
+                    cmd.Parameters.AddWithValue("@id", owner.Id);
+
+                    cmd.ExecuteNonQuery();
+                }
+            }
+        }
+
+        public void DeleteOwner(int ownerId)
+        {
+            using (SqlConnection conn = Connection)
+            {
+                conn.Open();
+
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"DELETE FROM Owner WHERE Id = @id";
+
+                    cmd.Parameters.AddWithValue("@id", ownerId);
+
+                    cmd.ExecuteNonQuery();
                 }
             }
         }
