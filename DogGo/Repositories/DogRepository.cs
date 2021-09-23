@@ -33,6 +33,7 @@ namespace DogGo.Repositories
                                                 d.[Name],
                                                 o.Name AS Owner,
                                                 d.Breed,
+                                                d.OwnerId,
                                                 ISNULL(d.Notes, 'None') AS Notes,
                                                 ISNULL(d.ImageUrl, 'None') AS ImageUrl
                                                 FROM Dog d
@@ -50,9 +51,11 @@ namespace DogGo.Repositories
                             Breed = reader.GetString(reader.GetOrdinal("Breed")),
                             Notes = reader.GetString(reader.GetOrdinal("Notes")),
                             ImageUrl = reader.GetString(reader.GetOrdinal("ImageUrl")),
+                            OwnerId = reader.GetInt32(reader.GetOrdinal("OwnerId")),
                             Owner = new Owner
                             {
-                                Name = reader.GetString(reader.GetOrdinal("Owner"))
+                                Name = reader.GetString(reader.GetOrdinal("Owner")),
+                                Id = reader.GetInt32(reader.GetOrdinal("Id"))
                             },
                         };
 
@@ -77,6 +80,7 @@ namespace DogGo.Repositories
                                                 d.Name,
                                                 o.Name AS Owner,
                                                 d.Breed,
+                                                d.OwnerId,
                                                 ISNULL(d.Notes, 'None') AS Notes,
                                                 ISNULL(d.ImageUrl, 'None') AS ImageUrl
                                                 FROM dog d
@@ -95,9 +99,11 @@ namespace DogGo.Repositories
                             Breed = reader.GetString(reader.GetOrdinal("Breed")),
                             Notes = reader.GetString(reader.GetOrdinal("Notes")),
                             ImageUrl = reader.GetString(reader.GetOrdinal("ImageUrl")),
+                            OwnerId = reader.GetInt32(reader.GetOrdinal("OwnerId")),
                             Owner = new Owner
                             {
-                                Name = reader.GetString(reader.GetOrdinal("Owner"))
+                                Name = reader.GetString(reader.GetOrdinal("Owner")),
+                                Id = reader.GetInt32(reader.GetOrdinal("Id"))
                             },
                         };
 
@@ -110,6 +116,53 @@ namespace DogGo.Repositories
                         reader.Close();
                         return null;
                     }
+                }
+            }
+        }
+
+        public List<Dog> GetDogsByOwnerId(int ownerId)
+        {
+            using (SqlConnection conn = Connection)
+            {
+                conn.Open();
+
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"
+                                        SELECT Id, Name, Breed, Notes, ImageUrl, OwnerId
+                                        FROM Dog
+                                        WHERE OwnerId = @ownerId
+                                        ";
+                    cmd.Parameters.AddWithValue("@ownerId", ownerId);
+
+                    SqlDataReader reader = cmd.ExecuteReader();
+
+                    List<Dog> dogs = new List<Dog>();
+
+                    while (reader.Read())
+                    {
+                        Dog dog = new Dog()
+                        {
+                            Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                            Name = reader.GetString(reader.GetOrdinal("Name")),
+                            Breed = reader.GetString(reader.GetOrdinal("Breed")),
+                            OwnerId = reader.GetInt32(reader.GetOrdinal("OwnerId"))
+                        };
+
+                        // This is checking if optional columns are null
+                        if (reader.IsDBNull(reader.GetOrdinal("Notes")) == false)
+                        {
+                            dog.Notes = reader.GetString(reader.GetOrdinal("Notes"));
+                        }
+                        if(reader.IsDBNull(reader.GetOrdinal("ImageUrl")) == false)
+                        {
+                            dog.ImageUrl = reader.GetString(reader.GetOrdinal("ImageUrl"));
+                        }
+
+                        dogs.Add(dog);
+                    }
+                    reader.Close();
+                    return dogs;
                 }
             }
         }
