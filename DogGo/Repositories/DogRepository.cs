@@ -33,6 +33,7 @@ namespace DogGo.Repositories
                                                 d.[Name],
                                                 o.Name AS Owner,
                                                 d.Breed,
+                                                d.OwnerId,
                                                 ISNULL(d.Notes, 'None') AS Notes,
                                                 ISNULL(d.ImageUrl, 'None') AS ImageUrl
                                                 FROM Dog d
@@ -50,9 +51,11 @@ namespace DogGo.Repositories
                             Breed = reader.GetString(reader.GetOrdinal("Breed")),
                             Notes = reader.GetString(reader.GetOrdinal("Notes")),
                             ImageUrl = reader.GetString(reader.GetOrdinal("ImageUrl")),
+                            OwnerId = reader.GetInt32(reader.GetOrdinal("OwnerId")),
                             Owner = new Owner
                             {
-                                Name = reader.GetString(reader.GetOrdinal("Owner"))
+                                Name = reader.GetString(reader.GetOrdinal("Owner")),
+                                Id = reader.GetInt32(reader.GetOrdinal("Id"))
                             },
                         };
 
@@ -77,6 +80,7 @@ namespace DogGo.Repositories
                                                 d.Name,
                                                 o.Name AS Owner,
                                                 d.Breed,
+                                                d.OwnerId,
                                                 ISNULL(d.Notes, 'None') AS Notes,
                                                 ISNULL(d.ImageUrl, 'None') AS ImageUrl
                                                 FROM dog d
@@ -95,9 +99,11 @@ namespace DogGo.Repositories
                             Breed = reader.GetString(reader.GetOrdinal("Breed")),
                             Notes = reader.GetString(reader.GetOrdinal("Notes")),
                             ImageUrl = reader.GetString(reader.GetOrdinal("ImageUrl")),
+                            OwnerId = reader.GetInt32(reader.GetOrdinal("OwnerId")),
                             Owner = new Owner
                             {
-                                Name = reader.GetString(reader.GetOrdinal("Owner"))
+                                Name = reader.GetString(reader.GetOrdinal("Owner")),
+                                Id = reader.GetInt32(reader.GetOrdinal("Id"))
                             },
                         };
 
