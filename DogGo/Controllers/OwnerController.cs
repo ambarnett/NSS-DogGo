@@ -13,16 +13,19 @@ namespace DogGo.Controllers
         private readonly IOwnerRepository _ownerRepo;
         private readonly IDogRepository _dogRepo;
         private readonly IWalkerRepository _walkerRepo;
+        private readonly INeighborhoodRepository _neighborhoodRepo;
 
         // ASP.NET will give us an instance of our Owner Repository. This is called "Dependency Injection"
         public OwnerController(
             IOwnerRepository ownerRepo,
             IDogRepository dogRepo,
-            IWalkerRepository walkerRepo)
+            IWalkerRepository walkerRepo,
+            INeighborhoodRepository neighborhoodRepo)
         {
             _ownerRepo = ownerRepo;
             _dogRepo = dogRepo;
             _walkerRepo = walkerRepo;
+            _neighborhoodRepo = neighborhoodRepo;
         }
         // GET: OwnerController
         public ActionResult Index()
@@ -53,7 +56,15 @@ namespace DogGo.Controllers
         // GET: OwnerController/Create
         public ActionResult Create()
         {
-            return View();
+            List<Neighborhood> neighborhoods = _neighborhoodRepo.GetAllNeighborhoods();
+
+            OwnerFormViewModel vm = new OwnerFormViewModel()
+            {
+                Owner = new Owner(),
+                Neighborhoods = neighborhoods
+            };
+
+            return View(vm);
         }
 
         // POST: OwnerController/Create
@@ -77,13 +88,15 @@ namespace DogGo.Controllers
         public ActionResult Edit(int id)
         {
             Owner owner = _ownerRepo.GetOwnerById(id);
+            List<Neighborhood> neighborhoods = _neighborhoodRepo.GetAllNeighborhoods();
 
-            if(owner == null)
+            OwnerFormViewModel vm = new OwnerFormViewModel()
             {
-                return NotFound();
-            }
+                Owner = owner,
+                Neighborhoods = neighborhoods
+            };
 
-            return View(owner);
+            return View(vm);
         }
 
         // POST: OwnerController/Edit/5
