@@ -11,6 +11,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using DogGo.Models;
 using DogGo.Repositories;
+using Microsoft.AspNetCore.Authentication.Cookies;
 
 namespace DogGo
 {
@@ -31,6 +32,9 @@ namespace DogGo
             services.AddTransient<IOwnerRepository, OwnerRepository>();
             services.AddTransient<INeighborhoodRepository, NeighborhoodRepository>();
             services.AddTransient<IDogRepository, DogRepository>();
+
+            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+                .AddCookie(options => options.LoginPath = "/Owners/LogIn");
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -51,6 +55,7 @@ namespace DogGo
             app.UseStatusCodePages();
             app.UseRouting();
 
+            app.UseAuthentication(); //Why do I get a 404 error if this and app.UserAuthorization are switched in order??? It works when they're like this.
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
